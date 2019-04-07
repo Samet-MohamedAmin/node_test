@@ -1,30 +1,49 @@
 const express = require('express');
 const app = express();
-const cors = require('cors');
 const mongoose = require('mongoose');
 
+// const cors = require('cors');
+// app.use(cors());
 
 app.use(express.json());
-app.use(cors());
 
 
 const greetingSchema = new mongoose.Schema({greeting: String});
 const Greeting = mongoose.model('Greeting', greetingSchema);
 
+app.get('/', (req, res) => {
+    res.send({message: 'It works!'});
+});
+
+app.get('/api/home', (req, res) => {
+    res.send({message: 'Welcome home!'});
+});
 
 app.get('/api/test', async (req, res) => {
     const greeting = await Greeting.findOne();
     res.send(greeting);
 });
 
-app.get('/api/home', async (req, res) => {
-    res.send({message: 'Welcome home!'});
+app.post('/api/test/add', async (req, res)=>{
+    const greeting = new Greeting({message: req.body.message});
+    res.send(await greeting.save());
 });
 
 
-mongoose.connect(`mongodb+srv://samet:${process.env.MONGO_PASSWORD}@cluster0-qjiwa.mongodb.net/test?retryWrites=true`)
+app.put('/api/test/update', async (req, res) => {
+    const greeting = await Greeting.findOne();
+    if(!greeting) return res.status(404).send('no greetings found');
+
+    const msg= req.body.message;
+    greeting.set({message: msg});
+    return res.send(greeting.save());
+});
+
+// console.log(process.env.MONGO_PASSWORD);
+
+mongoose.connect(`mongodb+srv://samet:samet@samet-mongo-w68d7.mongodb.net/test?retryWrites=true`)
     .then(() => {console.log('Connected to mongo...')})
-    .catch(err => console.error('Connection failed...'));
+    .catch(err => console.error('Connection to mongo failed...'));
 
 
 const port = process.env.PORT || 3000;
