@@ -24,8 +24,8 @@ app.get('/api/test', async (req, res) => {
     res.send(greeting);
 });
 
-app.post('/api/test/add', async (req, res)=>{
-    const greeting = new Greeting({message: req.body.message});
+app.get('/api/test/add', async (req, res)=>{
+    const greeting = new Greeting({message: "hellooo"});
     res.send(await greeting.save());
 });
 
